@@ -9,7 +9,7 @@ import datetime
 import asyncio
 
 from PyQt5 import QtGui, QtCore, QtWidgets
-from luk_op_gui import Ui_MainWindow
+from luk_op_gui_upd import Ui_MainWindow
 
 app = QtWidgets.QApplication(sys.argv)
 main_window = QtWidgets.QMainWindow()
@@ -30,7 +30,7 @@ class Element:
         if self.widget is not None:
             pxm = QtGui.QPixmap(os.path.dirname(os.path.abspath(__file__)) + '/img/' + self.code + str(self.state) + '.png')
             self.widget.setPixmap(pxm)
-            self.widget.resize(float(pxm.width()) / 2, float(pxm.height()) / 2)
+            self.widget.resize(float(pxm.width()) / 4, float(pxm.height()) / 4)
         else:
             print('Nothing to change')
     
@@ -99,6 +99,8 @@ class ScenarioController:
 
     def make_call(self):
         '''Сымитировать звонок диспетчеру'''
+        if elems['сс'] is not None:
+            elems['сс'].set_state(0)
         self.log(" Сделан звонок диспетчеру\n=== Сценарий завершен ===")
 
     def demo_scene(self):
@@ -123,7 +125,7 @@ if __name__ == '__main__':
     # все действия надо делать В РУЧНОМ РЕЖИМЕ
     scenario = {
         "сброс_журналирование": (lambda: sc.log(' === Сброс состояний начат ==='), True),
-        "сброс_температуры": (lambda: sc.set_temp(60), True),
+        "сброс_температуры": (lambda: sc.set_temp(60.5), True),
         "сброс_состояния_сс": (lambda: elems['сс'].set_state(0), True),
         "сброс_состояния_зугт": (lambda: elems['зугт'].set_state(0), True),
         "сброс_состояния_зуку": (lambda: elems['зуку'].set_state(0), True),
@@ -131,7 +133,7 @@ if __name__ == '__main__':
         "сброс_состояния_запг": (lambda: elems['запг'].set_state(1), True),
         "сброс_состояния_загб": (lambda: elems['загб'].set_state(1), True),
         "сброс_завершение": (lambda: sc.log(' === Сброс состояний завершен ==='), True),
-        "старт_сценария": (lambda: sc.set_temp(200), True),
+        "старт_сценария": (lambda: sc.set_temp(200.7), True),
         "переход_сс": (elems['сс'].change_state, lambda: sc.temp > 60) # условие тестовое, можно посмотреть вживую, если в предыдущем действии заменить 200 на 40, например
     }
 
