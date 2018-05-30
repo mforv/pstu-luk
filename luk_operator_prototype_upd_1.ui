@@ -10,10 +10,37 @@
     <height>665</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1000</width>
+    <height>665</height>
+   </size>
+  </property>
+  <property name="mouseTracking">
+   <bool>true</bool>
+  </property>
   <property name="windowTitle">
    <string>Тренажер оператора ГТУ</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>1000</width>
+     <height>665</height>
+    </size>
+   </property>
    <widget class="QLCDNumber" name="ctgt">
     <property name="geometry">
      <rect>
@@ -22,6 +49,12 @@
       <width>71</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>71</width>
+      <height>31</height>
+     </size>
     </property>
     <property name="palette">
      <palette>
@@ -137,10 +170,22 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>-60</y>
+      <y>-70</y>
       <width>914</width>
       <height>594</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>914</width>
+      <height>594</height>
+     </size>
     </property>
     <property name="text">
      <string/>
@@ -161,6 +206,12 @@
       <height>192</height>
      </rect>
     </property>
+    <property name="minimumSize">
+     <size>
+      <width>730</width>
+      <height>190</height>
+     </size>
+    </property>
    </widget>
    <widget class="QPushButton" name="btn_start">
     <property name="geometry">
@@ -171,6 +222,12 @@
       <height>48</height>
      </rect>
     </property>
+    <property name="minimumSize">
+     <size>
+      <width>140</width>
+      <height>48</height>
+     </size>
+    </property>
     <property name="text">
      <string>Запустить
 демо-сценарий</string>
@@ -180,10 +237,22 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>-60</y>
+      <y>-70</y>
       <width>914</width>
       <height>594</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>914</width>
+      <height>594</height>
+     </size>
     </property>
     <property name="text">
      <string/>
@@ -203,6 +272,18 @@
       <width>20</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>20</width>
+      <height>31</height>
+     </size>
     </property>
     <property name="palette">
      <palette>
@@ -309,7 +390,7 @@
      <string>T</string>
     </property>
     <property name="alignment">
-     <set>Qt::AlignHCenter|Qt::AlignTop</set>
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
    <widget class="QFrame" name="frame">
@@ -320,6 +401,18 @@
       <width>160</width>
       <height>310</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>160</width>
+      <height>310</height>
+     </size>
     </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
@@ -335,6 +428,12 @@
        <width>70</width>
        <height>48</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>70</width>
+       <height>48</height>
+      </size>
      </property>
      <property name="font">
       <font>
@@ -357,6 +456,12 @@
        <height>48</height>
       </rect>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>70</width>
+       <height>48</height>
+      </size>
+     </property>
      <property name="font">
       <font>
        <pointsize>20</pointsize>
@@ -378,6 +483,12 @@
        <height>48</height>
       </rect>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>48</width>
+       <height>48</height>
+      </size>
+     </property>
      <property name="pixmap">
       <pixmap>img/temp.png</pixmap>
      </property>
@@ -393,6 +504,12 @@
        <width>48</width>
        <height>48</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>48</width>
+       <height>48</height>
+      </size>
      </property>
      <property name="text">
       <string/>
@@ -412,6 +529,12 @@
        <width>70</width>
        <height>48</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>70</width>
+       <height>48</height>
+      </size>
      </property>
      <property name="font">
       <font>
@@ -434,6 +557,12 @@
        <height>48</height>
       </rect>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>48</width>
+       <height>48</height>
+      </size>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -453,6 +582,12 @@
        <height>48</height>
       </rect>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>48</width>
+       <height>48</height>
+      </size>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -471,6 +606,12 @@
        <width>70</width>
        <height>48</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>70</width>
+       <height>48</height>
+      </size>
      </property>
      <property name="font">
       <font>
@@ -493,6 +634,12 @@
        <height>48</height>
       </rect>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>48</width>
+       <height>48</height>
+      </size>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -511,6 +658,12 @@
        <width>70</width>
        <height>48</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>70</width>
+       <height>48</height>
+      </size>
      </property>
      <property name="font">
       <font>
@@ -534,6 +687,18 @@
       <height>380</height>
      </rect>
     </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>140</width>
+      <height>380</height>
+     </size>
+    </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
     </property>
@@ -549,6 +714,12 @@
        <height>25</height>
       </rect>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>25</height>
+      </size>
+     </property>
      <property name="text">
       <string>Закрыть ЗУ ГТ</string>
      </property>
@@ -561,6 +732,12 @@
        <width>120</width>
        <height>25</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>25</height>
+      </size>
      </property>
      <property name="text">
       <string>Закрыть ЗУ КУ</string>
@@ -575,6 +752,12 @@
        <height>25</height>
       </rect>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>25</height>
+      </size>
+     </property>
      <property name="text">
       <string>Включить ВТГ</string>
      </property>
@@ -587,6 +770,12 @@
        <width>120</width>
        <height>25</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>25</height>
+      </size>
      </property>
      <property name="text">
       <string>Открыть ЗА ПГ</string>
@@ -601,6 +790,12 @@
        <height>25</height>
       </rect>
      </property>
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>25</height>
+      </size>
+     </property>
      <property name="text">
       <string>Открыть ЗА ГБ</string>
      </property>
@@ -613,6 +808,12 @@
        <width>120</width>
        <height>48</height>
       </rect>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>48</height>
+      </size>
      </property>
      <property name="text">
       <string>Звонок
