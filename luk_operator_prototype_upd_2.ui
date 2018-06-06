@@ -213,7 +213,7 @@
      </size>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_start">
+   <widget class="QPushButton" name="btn_start_demo">
     <property name="geometry">
      <rect>
       <x>110</x>
@@ -230,7 +230,7 @@
     </property>
     <property name="text">
      <string>Запустить
-демо-сценарий</string>
+обучение</string>
     </property>
    </widget>
    <widget class="QLabel" name="gtu_static">
@@ -414,6 +414,9 @@
       <height>310</height>
      </size>
     </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
     </property>
@@ -496,7 +499,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLabel" name="zuku">
+    <widget class="QLabel" name="zuku_2">
      <property name="geometry">
       <rect>
        <x>100</x>
@@ -699,6 +702,9 @@
       <height>380</height>
      </size>
     </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
     </property>
@@ -821,14 +827,99 @@
      </property>
     </widget>
    </widget>
+   <widget class="QPushButton" name="btn_start_test">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>530</y>
+      <width>140</width>
+      <height>48</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>140</width>
+      <height>48</height>
+     </size>
+    </property>
+    <property name="text">
+     <string>Запустить
+тестирование</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="gtu_static_2">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>-70</y>
+      <width>914</width>
+      <height>594</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>914</width>
+      <height>594</height>
+     </size>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>raw_img/гту_2.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="zuku">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>-70</y>
+      <width>914</width>
+      <height>594</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>914</width>
+      <height>594</height>
+     </size>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>img/зуку.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <zorder>gtu_static_2</zorder>
+   <zorder>zuku</zorder>
    <zorder>gtu_static</zorder>
    <zorder>vtg</zorder>
    <zorder>ctgt</zorder>
    <zorder>label_8</zorder>
    <zorder>frame</zorder>
    <zorder>frame_2</zorder>
+   <zorder>btn_start_demo</zorder>
+   <zorder>btn_start_test</zorder>
    <zorder>log</zorder>
-   <zorder>btn_start</zorder>
   </widget>
  </widget>
  <resources/>
