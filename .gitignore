@@ -105,3 +105,5 @@ ENV/
 *.xlsx
 
 .idea/
+.vs/
+.directory

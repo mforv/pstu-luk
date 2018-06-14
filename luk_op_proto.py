@@ -22,10 +22,12 @@ class LukWidget(QtWidgets.QMainWindow, gui.Ui_MainWindow):
         self.setupUi(self)
         self.resized.connect(self.scale_elems)
         self.sc = controller
-        self.sc.new_log_entry.connect(self.new_log_entry)  # соединяем один слот с сигналом
-        self.sc.new_temp_value.connect(self.new_temp_value)  # другой слот с сигналом
-        self.sc.scenario_ended.connect(self.stop_controller)
-        self.sc.button_highlight.connect(self.highlight_button)
+        self.sc.sig_new_log_entry.connect(self.new_log_entry)  # соединяем один слот с сигналом
+        self.sc.sig_new_temp_value.connect(self.new_temp_value)  # другой слот с сигналом
+        self.sc.sig_scenario_ended.connect(self.stop_controller)
+        self.sc.sig_highlight.connect(self.highlight_button)
+        self.sc.sig_reset_style.connect(self.reset_stylesheet)
+        self.sc.sig_reset_all_styles.connect(self.reset_global_stylesheets)
         self.w = self.window().width()
         self.h = self.window().height()
         children = self.findChildren(QtWidgets.QWidget)
@@ -79,16 +81,16 @@ class LukWidget(QtWidgets.QMainWindow, gui.Ui_MainWindow):
         self.w = w1
         self.h = h1
     
-    def highlight_button(self, button, mode):
-        if mode == 'highlight':
-            btn_color = QtGui.QColor(255, 255, 127)
-        else:
-            btn_color = QtGui.QColor(211, 218, 227)
-        brush = QtGui.QBrush(btn_color)
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        tmp_plt = button.palette()
-        tmp_plt.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Button, brush)
-        button.setPalette(tmp_plt)
+    def highlight_button(self, button):
+        button.setStyleSheet('background-color:rgb(255, 255, 127)')
+    
+    def reset_stylesheet(self, widget):
+        widget.setStyleSheet('')
+    
+    def reset_global_stylesheets(self):
+        children = self.findChildren(QtWidgets.QWidget)
+        for child in children:
+            child.setStyleSheet('')
 
     def mouseMoveEvent(self, event):
         super().mouseMoveEvent(event)
@@ -165,10 +167,12 @@ class Element:
 # Класс-контроллер, работает в отдельном потоке и посылает сигналы интерфейсу
 class ScenarioController(QtCore.QThread):
 
-    new_log_entry = QtCore.pyqtSignal(object)  # сигнал для обновления лога
-    new_temp_value = QtCore.pyqtSignal(float, float)  # сигнал для обновления цифрового табло
-    scenario_ended = QtCore.pyqtSignal(int)  # сигнал для завершения сценария
-    button_highlight = QtCore.pyqtSignal(object, str)
+    sig_new_log_entry = QtCore.pyqtSignal(object)  # сигнал для обновления лога
+    sig_new_temp_value = QtCore.pyqtSignal(float, float)  # сигнал для обновления цифрового табло
+    sig_scenario_ended = QtCore.pyqtSignal(int)  # сигнал для завершения сценария
+    sig_highlight = QtCore.pyqtSignal(object)
+    sig_reset_style = QtCore.pyqtSignal(object)
+    sig_reset_all_styles = QtCore.pyqtSignal()
 
     def __init__(self, temp=60, critical_temp=200, timer=60.0):
         QtCore.QThread.__init__(self)
@@ -185,6 +189,9 @@ class ScenarioController(QtCore.QThread):
         self.wait()
 
     def execute_scenario(self, scenario): # последовательно выполнить все действия, если выполнены их условия, в сценарии scenario
+        self.start_time = datetime.datetime.now().timestamp()
+        self.current_time = self.start_time
+        self.action_handler = []
         for action in scenario.keys():
             self.action_handler.append([scenario[action], 0, self.current_time])
         self.active = True
@@ -218,7 +225,7 @@ class ScenarioController(QtCore.QThread):
     def log(self, msg):
         '''Логирование в консоль и в интерфейс'''
         print(str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")) + ' ' + str(msg))
-        self.new_log_entry.emit(msg)
+        self.sig_new_log_entry.emit(msg)
     
     def reset_timer(self, new_timer=60.0):
         self.timer = new_timer
@@ -230,7 +237,7 @@ class ScenarioController(QtCore.QThread):
         self.log('Значение Ткрит установлено на ' + str(self.crit_t))
     
     def display_temp(self):
-        self.new_temp_value.emit(self.temp, self.crit_t)
+        self.sig_new_temp_value.emit(self.temp, self.crit_t)
 
     def set_temp(self, new_temp):
         '''Вручную установить температуру'''
@@ -263,23 +270,33 @@ class ScenarioController(QtCore.QThread):
 
     def make_call(self):
         '''Сымитировать звонок диспетчеру'''
-        #self.active = False
         self.log("Сделан звонок диспетчеру")
-        self.scenario_ended.emit(0)
+        self.sig_scenario_ended.emit(0)
     
     def fail(self):
-        #self.active = False
+        '''Провал задания по таймеру'''
         self.log("Задание не выполнено в срок")
-        self.scenario_ended.emit(1)
+        self.sig_scenario_ended.emit(1)
     
-    def highlight(self, button, mode):
-        self.button_highlight.emit(button, mode)
+    def highlight(self, button):
+        '''Послать сигнал для подсветки кнопки'''
+        self.sig_highlight.emit(button)
+    
+    def style_reset(self, button):
+        '''Сбросить стиль кнопки (после подсветки)'''
+        self.sig_reset_style.emit(button)
+
+    def global_style_reset(self):
+        '''Сбросить стиль всех виджетов'''
+        self.sig_reset_all_styles.emit()
     
     def start_demo(self):
+        '''Запустить демонстрационный сценарий'''
         self.mode = 'demo'
         self.start()
 
     def start_test(self):
+        '''Запустить тестовый сценарий'''
         self.mode = 'test'
         self.start()
 
@@ -304,7 +321,9 @@ if __name__ == '__main__':
     elems['зугт'] = Element(sc, 'зугт', main_window.zugt)
     elems['зуку'] = Element(sc, 'зуку', main_window.zuku)
     elems['зуку2'] = Element(sc, 'зуку2', main_window.zuku_2)
+    elems['зуку3'] = Element(sc, 'зуку3', main_window.zuku_3)
     elems['втг'] = Element(sc, 'втг', main_window.vtg, 1)
+    elems['втг2'] = Element(sc, 'втг2', main_window.vtg_2, 1)
     elems['запг'] = Element(sc, 'запг', main_window.zapg, 1)
     elems['загб'] = Element(sc, 'загб', main_window.zagb, 1)
 
@@ -321,7 +340,9 @@ if __name__ == '__main__':
         "сброс_состояния_зугт": (lambda: elems['зугт'].set_state(0), None, -1, 0),
         "сброс_состояния_зуку":(lambda: elems['зуку'].set_state(0), None, -1, 0),
         "сброс_состояния_зуку2":(lambda: elems['зуку2'].set_state(0), None, -1, 0),
+        "сброс_состояния_зуку3":(lambda: elems['зуку3'].set_state(0), None, -1, 0),
         "сброс_состояния_втг": (lambda: elems['втг'].set_state(1), None, -1, 0),
+        "сброс_состояния_втг2": (lambda: elems['втг2'].set_state(1), None, -1, 0),
         "сброс_состояния_запг": (lambda: elems['запг'].set_state(1), None, -1, 0),
         "сброс_состояния_загб": (lambda: elems['загб'].set_state(1), None, -1, 0),
         "сброс_завершение": (lambda: sc.log(' === Сброс состояний завершен ==='), None, -1, 0),
@@ -340,24 +361,29 @@ if __name__ == '__main__':
                                                                                                 elems['запг'].state == 0 and
                                                                                                 elems['загб'].state == 0, 2, 0),
         "дублирование_сигнала_зуку": (lambda: elems['зуку2'].set_state(elems['зуку'].state), lambda: elems['зуку'].state != elems['зуку2'].state, 0.1, 0),
+        "дублирование_сигнала_зуку_вентили": (lambda: elems['зуку3'].set_state(elems['зуку'].state), lambda: elems['зуку'].state != elems['зуку3'].state, 0.1, 0),
+        "комплексное_отображение_втг": (lambda: elems['втг2'].set_state(elems['втг'].state), lambda: elems['втг'].state != elems['втг2'].state, 0.1, 0),
         "возврат_сс_в_норму": (lambda: elems['сс'].set_state(0, lambda: sc.check('Т < Ткрит', lambda: sc.temp < sc.crit_t)), lambda: elems['сс'].state == 1, 0.1, 0),
         "провал_задания_по_таймеру": (lambda: sc.fail(), lambda: sc.current_time >= sc.start_time + sc.timer and sc.temp >= sc.crit_t, 0.1, 0)
     }
 
     demo_scenario = {
         "сброс_журналирование": (lambda: sc.log(' === Сброс состояний начат ==='), None, -1, 0), 
+        "сброс_подсветки": (lambda: sc.global_style_reset(), None, -1, 0),
         "установка_значения_т_крит": (lambda: sc.set_crit_t(200), None, -1, 0),
         "сброс_температуры": (lambda: sc.set_temp(60.5), None, -1, 0),
         "сброс_состояния_сс": (lambda: elems['сс'].set_state(0), None, -1, 0),
         "сброс_состояния_зугт": (lambda: elems['зугт'].set_state(0), None, -1, 0),
         "сброс_состояния_зуку":(lambda: elems['зуку'].set_state(0), None, -1, 0),
         "сброс_состояния_зуку2":(lambda: elems['зуку2'].set_state(0), None, -1, 0),
+        "сброс_состояния_зуку3":(lambda: elems['зуку3'].set_state(0), None, -1, 0),
         "сброс_состояния_втг": (lambda: elems['втг'].set_state(1), None, -1, 0),
+        "сброс_состояния_втг2": (lambda: elems['втг2'].set_state(1), None, -1, 0),
         "сброс_состояния_запг": (lambda: elems['запг'].set_state(1), None, -1, 0),
         "сброс_состояния_загб": (lambda: elems['загб'].set_state(1), None, -1, 0),
         "сброс_завершение": (lambda: sc.log(' === Сброс состояний завершен ==='), None, -1, 0),
         "сс_при_критическом_т": (lambda: elems['сс'].set_state(1, lambda: sc.check('Т > Ткрит', lambda: sc.temp > sc.crit_t)), lambda: elems['сс'].state != 1, 0.1, 0),
-        "повышение_температуры": (lambda: sc.raise_temp(60.45), lambda: sc.temp < sc.crit_t and 
+        "повышение_температуры": (lambda: sc.raise_temp(60.44), lambda: sc.temp < sc.crit_t and 
                                                                         elems['зугт'].state == 0 and 
                                                                         elems['зуку'].state == 0 and
                                                                         elems['втг'].state == 1 and
@@ -365,36 +391,38 @@ if __name__ == '__main__':
                                                                         elems['загб'].state == 1, 2, 15),
         "инф_0":(lambda: sc.log("Температура превысила критическую. Необходимо принять меры"), lambda: sc.temp > sc.crit_t, -1, 15),
         "инф_1":(lambda: sc.log("Шаг 1: закрыть запорное устройство газовой турбины"), lambda: sc.temp > sc.crit_t, -1, 20),
-        "инф_1_1":(lambda: sc.highlight(main_window.btn_gt, 'highlight'), lambda: sc.temp > sc.crit_t, -1, 20),
+        "инф_1_1":(lambda: sc.highlight(main_window.btn_gt), lambda: sc.temp > sc.crit_t, -1, 20),
         "инф_1_2":(lambda: elems['зугт'].set_state(1), lambda: sc.temp > sc.crit_t, -1, 25),
         "инф_2":(lambda: sc.log("Шаг 2: закрыть запорное устройство котла-утилизатора"), lambda: sc.temp > sc.crit_t, -1, 30),
-        "инф_2_0":(lambda: sc.highlight(main_window.btn_gt, 'normal'), lambda: sc.temp > sc.crit_t, -1, 30),
-        "инф_2_1":(lambda: sc.highlight(main_window.btn_ku, 'highlight'), lambda: sc.temp > sc.crit_t, -1, 30),
+        "инф_2_0":(lambda: sc.style_reset(main_window.btn_gt), lambda: sc.temp > sc.crit_t, -1, 30),
+        "инф_2_1":(lambda: sc.highlight(main_window.btn_ku), lambda: sc.temp > sc.crit_t, -1, 30),
         "инф_2_2":(lambda: elems['зуку'].set_state(1), lambda: sc.temp > sc.crit_t, -1, 35),
         "инф_3":(lambda: sc.log("Шаг 3: включить вентиляцию"), lambda: sc.temp > sc.crit_t, -1, 40),
-        "инф_3_0":(lambda: sc.highlight(main_window.btn_ku, 'normal'), lambda: sc.temp > sc.crit_t, -1, 40),
-        "инф_3_1":(lambda: sc.highlight(main_window.btn_vtg, 'highlight'), lambda: sc.temp > sc.crit_t, -1, 40),
+        "инф_3_0":(lambda: sc.style_reset(main_window.btn_ku), lambda: sc.temp > sc.crit_t, -1, 40),
+        "инф_3_1":(lambda: sc.highlight(main_window.btn_vtg), lambda: sc.temp > sc.crit_t, -1, 40),
         "инф_3_2":(lambda: elems['втг'].set_state(0), lambda: sc.temp > sc.crit_t, -1, 45),
         "инф_4":(lambda: sc.log("Шаг 4: открыть запорную арматуру ПГ"), lambda: sc.temp > sc.crit_t, -1, 50),
-        "инф_4_0":(lambda: sc.highlight(main_window.btn_vtg, 'normal'), lambda: sc.temp > sc.crit_t, -1, 50),
-        "инф_4_1":(lambda: sc.highlight(main_window.btn_pg, 'highlight'), lambda: sc.temp > sc.crit_t, -1, 50),
+        "инф_4_0":(lambda: sc.style_reset(main_window.btn_vtg), lambda: sc.temp > sc.crit_t, -1, 50),
+        "инф_4_1":(lambda: sc.highlight(main_window.btn_pg), lambda: sc.temp > sc.crit_t, -1, 50),
         "инф_4_2":(lambda: elems['запг'].set_state(0), lambda: sc.temp > sc.crit_t, -1, 55),
         "инф_5":(lambda: sc.log("Шаг 5: открыть запорную арматуру ГБ"), lambda: sc.temp > sc.crit_t, -1, 60),
-        "инф_5_0":(lambda: sc.highlight(main_window.btn_pg, 'normal'), lambda: sc.temp > sc.crit_t, -1, 60),
-        "инф_5_1":(lambda: sc.highlight(main_window.btn_gb, 'highlight'), lambda: sc.temp > sc.crit_t, -1, 60),
+        "инф_5_0":(lambda: sc.style_reset(main_window.btn_pg), lambda: sc.temp > sc.crit_t, -1, 60),
+        "инф_5_1":(lambda: sc.highlight(main_window.btn_gb), lambda: sc.temp > sc.crit_t, -1, 60),
         "инф_5_2":(lambda: elems['загб'].set_state(0), lambda: sc.temp > sc.crit_t, -1, 65),
-        "снижение_температуры_при_правильных_действиях": (lambda: sc.lower_temp(10.25), lambda: sc.temp > 60 and 
+        "снижение_температуры_при_правильных_действиях": (lambda: sc.lower_temp(10.22), lambda: sc.temp > 60 and 
                                                                                                 elems['зугт'].state == 1 and 
                                                                                                 elems['зуку'].state == 1 and
                                                                                                 elems['втг'].state == 0 and
                                                                                                 elems['запг'].state == 0 and
                                                                                                 elems['загб'].state == 0, 2, 0),
         "инф_6":(lambda: sc.log("Шаг 6: после снижения температуры сообщить диспетчеру"), lambda: sc.temp <= 70, -1, 100),
-        "инф_6_0":(lambda: sc.highlight(main_window.btn_gb, 'normal'), lambda: sc.temp <= 70, -1, 100),
-        "инф_6_1":(lambda: sc.highlight(main_window.btn_call, 'highlight'), lambda: sc.temp <= 70, -1, 100),
-        "инф_6_3":(lambda: sc.highlight(main_window.btn_call, 'normal'), lambda: sc.temp <= 70, 1, 102),
+        "инф_6_0":(lambda: sc.style_reset(main_window.btn_gb), lambda: sc.temp <= 70, -1, 100),
+        "инф_6_1":(lambda: sc.highlight(main_window.btn_call), lambda: sc.temp <= 70, -1, 100),
+        "инф_6_3":(lambda: sc.global_style_reset(), lambda: sc.temp <= 70, 1, 102),
         "инф_6_2":(lambda: sc.make_call(), lambda: sc.temp <= 70, -1, 105),
         "дублирование_сигнала_зуку": (lambda: elems['зуку2'].set_state(elems['зуку'].state), lambda: elems['зуку'].state != elems['зуку2'].state, 0.1, 0),
+        "дублирование_сигнала_зуку_вентили": (lambda: elems['зуку3'].set_state(elems['зуку'].state), lambda: elems['зуку'].state != elems['зуку3'].state, 0.1, 0),
+        "комплексное_отображение_втг": (lambda: elems['втг2'].set_state(elems['втг'].state), lambda: elems['втг'].state != elems['втг2'].state, 0.1, 0),
         "возврат_сс_в_норму": (lambda: elems['сс'].set_state(0, lambda: sc.check('Т < Ткрит', lambda: sc.temp < sc.crit_t)), lambda: elems['сс'].state == 1, 0.1, 0)
     }
 
